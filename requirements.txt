@@ -1,0 +1,2 @@
+# Only needed for the optional Streamlit Community Cloud mirror (streamlit_app.py).
+streamlit>=1.36

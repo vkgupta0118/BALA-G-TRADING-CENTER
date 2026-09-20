@@ -1,0 +1,16 @@
+node_modules/
+dist/
+dist-dev/
+.tmp/
+test-results/
+playwright-report/
+blob-report/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+Thumbs.db
+
+# Generated proof-of-work images (kept in E:\AI\siliguri, not in git)
+/screenshots/
