@@ -104,3 +104,161 @@ Deployment is now automatic: **push to `main` → GitHub Actions builds and publ
 2. Confirm on a phone after the first deploy: WhatsApp, Call, Directions, quote submit, Bengali toggle.
 3. Google Search Console → submit `/sitemap.xml`. Google Business Profile → add website, follow `docs/google-business-profile-checklist.md`.
 4. Start week 1 of `docs/90-day-growth-plan.md` and the weekly scorecard.
+
+---
+
+# Redesign — 21 September 2026 (image-led rebuild — DEPLOYED, see the final section)
+
+Run after an `/llm-council` audit of the live site through four lenses (Siliguri
+homeowner, contractor/mason, local SEO & conversion, mobile UX/a11y/performance).
+It was built and tested locally first, held back until the owner approved the
+photographs, hours, name and numbers, and then deployed (record at the end of
+this file).
+
+## What the council concluded
+
+The 3D hero was a symptom, not the disease. Four of five advisors independently
+landed on the same diagnosis: the site read as a template because it refused to
+answer five consecutive questions — hours, delivery, brands, prices, reviews.
+Each refusal had a defensible individual reason; stacked, they read as an empty
+shell. The FAQ made it worse by asking "Do you deliver to my site?" and then not
+answering. Peer review added three things no single advisor caught: adding
+photographs moves the largest contentful paint from text to an image on a host
+with no image CDN; logging quote submissions would collect personal data under
+India's DPDP Act 2023 while the site promises it stores nothing; and "say you
+deliver, loudly" would have invented the exact fact the guardrails protected.
+
+Two council recommendations were rejected on the evidence: publishing a daily
+rate block (a static site cannot sustain a daily commit, and a stale rate is
+worse than none) and logging quote submissions (privacy, and it contradicts the
+site's own copy).
+
+## Owner facts confirmed 2026-09-21
+
+| Fact | Value | Source |
+|---|---|---|
+| Hours | Every day, 8:00–18:00 | Owner |
+| Delivery | Offered | Owner |
+| Brands | UltraTech, Ambuja, Star, Dalmia Bharat, Emami Double Bull | Shop's visiting card + godown photos |
+| WhatsApp | 919339188629 | Owner |
+| Call / structured data | 917908246939 (Shashi Bhushan Sah) | Shop's visiting card |
+| Puja counter | "Vikash Store" | Owner |
+| Name | M/S Balajee Trading Centre | Visiting card — Google's "M.S. BALA G TRADING CENTER" is the outlier |
+
+## What changed
+
+The CSS-3D scene is deleted outright — `MaterialsScene`, `LazyScene`,
+`SceneFallback` and `scene.css`, 513 lines gone. The hero now carries a
+photograph of the shop's own MRB-stamped brick stack with the landmark captioned
+over it; the cement and brands cards carry godown photographs. Categories with no
+photograph yet show a marked "photo coming soon" panel rather than a stock image.
+
+Photographs run through `scripts/assets/images.py`, which crops the camera
+watermark off the brick photo, emits AVIF/WebP/JPEG at several widths, and records
+intrinsic dimensions in `src/config/images.generated.ts`. `<Picture>` reserves
+every box with `width`/`height` plus `aspect-ratio`, so CLS from images is zero by
+construction. Exactly one image is `eager` + `fetchpriority=high` — the hero, at
+**39 KB of AVIF at 640px**. Everything else is lazy and low priority.
+
+New **Puja Samagri / Puja Materials** category (Bengali "পূজার সামগ্রী") on Home,
+Products and the quote builder, with a festival field and a required-date field
+that appear only once a puja line is added and flow through into the WhatsApp
+message. The only claim used is the approved one: *"Vikash Store — Puja Samagri
+available at M/S Balajee Trading Centre."*
+
+A new "How to order" section states the four steps. Hours appear in the hero, the
+trust strip and `openingHoursSpecification` for all seven days; the JSON-LD now
+declares `["LocalBusiness","HardwareStore"]` and a `department` for the Puja
+counter.
+
+## A real defect the new tests caught
+
+At 375×812 the hero's secondary CTA rendered at y=751–807, underneath a sticky bar
+whose top edge is at y=743 — the button was sitting under the bar on first paint.
+The hero rhythm now tightens below 64em; both CTAs end at y=651, clearing the bar
+by 92px. `tests/e2e/media.spec.ts` pins this so it cannot regress.
+
+## Test results
+
+`npm run verify` exit 0: typecheck clean, Biome clean across 59 files, **28 unit
+tests** (8 new, all Puja), build 5 pages, **74 E2E tests** across desktop and
+Pixel 7 (18 new). 20 screenshot/overflow checks pass at 375/768/1024/1440 with no
+horizontal overflow.
+
+## Not done at that point, deliberately
+
+Not yet deployed — the owner asked to approve the photographs first. Core Web
+Vitals are reasoned about and budgeted, not measured against a real device on a
+real network. The Bengali copy, including the new strings, is still unread by a
+Bengali speaker.
+
+---
+
+# Deployment of the redesign — 21 September 2026 (owner approved: "yes proceed")
+
+**Live URL: https://vkgupta0118.github.io/BALA-G-TRADING-CENTER/** — now serving
+the redesign. Deployed by GitHub Actions run **#22** on commit `a20a1f8`
+(`build` 35s · `e2e` 1m 26s · `deploy` 9s, all green; Pages artifact 3.11 MB).
+
+## How it got there
+
+Neither the sandbox nor the local machine can `git push` to GitHub (both sit
+behind the same egress policy), so every change went through GitHub's web upload
+form driven by Claude in Chrome, folder by folder. Text files were injected in
+chunks with a byte-length + DJB2 checksum computed in the browser and compared
+against the sandbox's value before each commit was allowed; the five
+photographs, the workflow and the docs went through the extension's own file
+upload. The four obsolete `scene/` files were deleted through GitHub's delete
+page. Runs #4–#21 on the intermediate commits were expected to fail (the tree was
+inconsistent while files landed) and did; run #22 is the first run on the
+complete tree.
+
+Before triggering the build, the repository was cloned back into the sandbox
+and diffed file-by-file against the local commit: **80 of 83 tracked text files
+byte-identical**, the three differences being the workflow and the two docs that
+were deliberately uploaded last. Photo derivatives (`public/images/`) are not in
+git; CI rebuilds them from `assets-source/photos/` on every run.
+
+One correction made on the way: the README's owner table still said the call
+number was "the same number" as WhatsApp and described hours/brands/photos as
+hidden or absent. It now states WhatsApp 919339188629, call 917908246939 (visiting
+card), hours verified 8:00–18:00 every day, delivery confirmed, six categories
+including Puja Samagri, and five photographs in use with seven still needed.
+
+## Verified on the live URL (checked in a browser against the deployed site)
+
+- `/` h1 "Cement, bricks and TMT rods, priced the same day"; the hero is the
+  shop's brick stack served as **AVIF** (`bricks-stack-960.avif`, eager,
+  fetchpriority=high); the CSS-3D scene is gone (0 matching elements).
+- Hours badge "Open every day · 8 am – 6 pm"; "How to order" renders 4 steps.
+- Puja note reads exactly **"Vikash Store — Puja Samagri available at M/S
+  Balajee Trading Centre."**
+- **11 `wa.me` links, all on `919339188629`**; click-to-call `tel:+917908246939`;
+  Directions → `https://maps.app.goo.gl/9FQnudyceXPjySFi7`.
+- JSON-LD: `@type ["LocalBusiness","HardwareStore"]`, `telephone
+  +917908246939`, `openingHoursSpecification` 08:00–18:00 for all seven days, 5
+  brands, `department[0].name` "Vikash Store".
+- Image files served with correct types: `bricks-stack-1280.{avif 177 KB, webp
+  265 KB, jpg 323 KB}`, `cement-stock-640.avif` 34 KB, `cement-brands-960.webp`
+  49 KB, `visiting-card-960.jpg` 89 KB (all HTTP 200).
+- `/quote?add=puja` on the live build: the Puja fieldset appears, default unit is
+  `sets`, and the generated message contains the item list, "3 sets", "Puja /
+  festival: Lakshmi Puja" and "Needed by: 20 Oct 2026".
+- No horizontal overflow at desktop width.
+
+## Still not verified / still needs the owner
+
+- **Tap WhatsApp and Call on a real phone.** The links are correct; whether
+  WhatsApp Business is active on 93391 88629 and the call reaches 79082 46939 can
+  only be confirmed by tapping them.
+- Core Web Vitals on a real device and network (the build is budgeted for LCP ≤
+  2.5s / CLS 0 but not measured in the field yet).
+- The **7 photographs** in `docs/image-asset-plan.md` — storefront/signboard
+  first; TMT, hardware, Puja Samagri and materials cards still show the
+  "photo coming soon" panel.
+- Google Business Profile: correct the name to "M/S Balajee Trading Centre" and
+  add the website URL; Search Console: submit `/sitemap.xml`.
+- Bengali copy review by a native speaker.
+- Local copy `E:\AI\siliguri` mirrors the deployed source; the retired `scene`
+  files were moved to `E:\AI\siliguri\_to_delete\` because this session cannot
+  delete on that machine — delete that folder when convenient.
