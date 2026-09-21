@@ -47,6 +47,8 @@ export const env = {
   showBrands: flag(import.meta.env.PUBLIC_SHOW_BRANDS),
   deliveryVerified: flag(import.meta.env.PUBLIC_DELIVERY_VERIFIED),
   hoursVerified: flag(import.meta.env.PUBLIC_HOURS_VERIFIED),
+  /** Trading name of the Puja Samagri counter, or '' when the owner has not confirmed one. */
+  pujaCounterName: clean(import.meta.env.PUBLIC_PUJA_COUNTER_NAME),
   contactEmail: clean(import.meta.env.PUBLIC_CONTACT_EMAIL),
   ga4Id: clean(import.meta.env.PUBLIC_GA4_MEASUREMENT_ID),
   googleAdsId: clean(import.meta.env.PUBLIC_GOOGLE_ADS_ID),

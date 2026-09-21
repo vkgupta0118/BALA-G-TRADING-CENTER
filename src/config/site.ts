@@ -25,9 +25,10 @@ export const site = {
   name: env.businessName,
   /** Short name for tight UI spaces (sticky bar, footer). */
   shortName: 'Balajee Trading',
-  /** The Google Business Profile currently shows "M.S. BALA G TRADING CENTER" – the owner must
-   *  confirm the final spelling and update Google to match the website. */
-  nameNeedsConfirmation: true,
+  /** The shop's printed visiting card reads "M/S BALAJEE TRADING CENTRE", which is the
+   *  spelling this site uses. The Google Business Profile still shows
+   *  "M.S. BALA G TRADING CENTER" – Google is the outlier and should be corrected there. */
+  nameNeedsConfirmation: false,
   legalNameAlternatives: ['M.S. BALA G TRADING CENTER', 'M/S BALAJEE TRADING CENTRE'],
   tagline: 'Cement, bricks, TMT steel and hardware on Champasari Road, Siliguri.',
 
@@ -45,21 +46,28 @@ export const site = {
   mapsUrl: env.mapsUrl,
 
   /**
-   * DRAFT hours – derived only from the Google listing hint "Opens 8 am Mon".
-   * Closing time and weekly pattern are NOT confirmed. Shown only when PUBLIC_HOURS_VERIFIED=true.
+   * Confirmed by the owner on 2026-09-21: open every day, 8:00 to 18:00.
+   * Shown only when PUBLIC_HOURS_VERIFIED=true.
    */
   openingHours: [
     {
-      days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
       opens: '08:00',
-      closes: '20:00',
+      closes: '18:00',
     },
   ] as OpeningHours[],
   hoursVerified: env.hoursVerified,
 
-  /** Brands seen on the shop signboard. Text only, shown only when PUBLIC_SHOW_BRANDS=true.
-   *  Never describe the shop as an "authorised dealer" unless the owner provides dealership proof. */
-  brands: ['UltraTech Cement', 'Dalmia Cement', 'Star Cement'],
+  /** The five cement brands printed on the shop's own visiting card, confirmed by the
+   *  owner on 2026-09-21. Shown only when PUBLIC_SHOW_BRANDS=true. Listing a brand says
+   *  the shop sells it — never that it is an authorised dealer, which needs documentation. */
+  brands: [
+    'UltraTech Cement',
+    'Ambuja Cement',
+    'Star Cement',
+    'Dalmia Bharat Cement',
+    'Emami Double Bull Cement',
+  ],
   showBrands: env.showBrands,
 
   /** Localities customers can pick in the quote builder. This is a selection list, not a delivery promise. */
@@ -87,6 +95,10 @@ export const site = {
    * The reviews section links to Google reviews when this list is empty.
    */
   testimonials: [] as Testimonial[],
+
+  /** Trading name of the Puja Samagri counter ("Vikash Store"), confirmed by the owner.
+   *  Empty means no second business name is shown anywhere. */
+  pujaCounterName: env.pujaCounterName,
 
   founded: undefined as string | undefined,
   contactEmail: env.contactEmail,

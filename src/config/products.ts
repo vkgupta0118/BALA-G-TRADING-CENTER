@@ -1,9 +1,13 @@
+import type { GeneratedImageSlug } from './images.generated';
+
 /**
  * Product categories offered by the shop. Deliberately no prices, stock levels
  * or SKU lists – those change daily and are quoted over WhatsApp.
  */
 
 export type UnitId =
+  | 'sets'
+  | 'items'
   | 'bags'
   | 'pieces'
   | 'thousand_pieces'
@@ -22,7 +26,7 @@ export interface UnitOption {
 }
 
 export interface ProductCategory {
-  id: 'cement' | 'bricks' | 'tmt' | 'hardware' | 'materials';
+  id: 'cement' | 'bricks' | 'tmt' | 'hardware' | 'materials' | 'puja';
   slug: string;
   name: string;
   shortDescription: string;
@@ -35,10 +39,21 @@ export interface ProductCategory {
   defaultUnit: UnitId;
   /** schema.org category string */
   schemaCategory: string;
-  icon: 'cement' | 'bricks' | 'steel' | 'hardware' | 'materials';
+  icon: 'cement' | 'bricks' | 'steel' | 'hardware' | 'materials' | 'puja';
+  /** Slug in public/images for this category's own photograph, when one exists. */
+  image?: GeneratedImageSlug;
+  /** Alt text for that photograph – describes what is actually in the frame. */
+  imageAlt?: string;
+  /** True when the owner has not supplied a photograph of this category yet.
+   *  The card then shows a clearly-marked "photo coming" panel rather than a stock image. */
+  photoPending?: boolean;
+  /** Common specifications customers are asked for, shown under the card. */
+  typicalSpecs?: string;
 }
 
 export const UNIT_LABELS: Record<UnitId, string> = {
+  sets: 'sets',
+  items: 'items',
   bags: 'bags',
   pieces: 'pieces',
   thousand_pieces: 'thousand pieces',
@@ -77,6 +92,9 @@ export const productCategories: ProductCategory[] = [
     defaultUnit: 'bags',
     schemaCategory: 'Building Materials > Cement',
     icon: 'cement',
+    image: 'cement-stock',
+    imageAlt: 'Bags of Dalmia cement stacked in the godown at Balajee Trading Centre',
+    typicalSpecs: 'OPC 43 · OPC 53 · PPC — sold by the bag',
   },
   {
     id: 'bricks',
@@ -99,6 +117,9 @@ export const productCategories: ProductCategory[] = [
     defaultUnit: 'thousand_pieces',
     schemaCategory: 'Building Materials > Bricks & Blocks',
     icon: 'bricks',
+    image: 'bricks-stack',
+    imageAlt: 'Stack of MRB-stamped red clay bricks in the yard at Balajee Trading Centre',
+    typicalSpecs: 'Red clay brick — quoted per 1,000 pieces or by the piece',
   },
   {
     id: 'tmt',
@@ -122,6 +143,8 @@ export const productCategories: ProductCategory[] = [
     defaultUnit: 'kg',
     schemaCategory: 'Building Materials > Steel & Reinforcement',
     icon: 'steel',
+    photoPending: true,
+    typicalSpecs: '8 · 10 · 12 · 16 · 20 mm — by kg, quintal or tonne',
   },
   {
     id: 'hardware',
@@ -140,6 +163,8 @@ export const productCategories: ProductCategory[] = [
     defaultUnit: 'units',
     schemaCategory: 'Hardware',
     icon: 'hardware',
+    photoPending: true,
+    typicalSpecs: 'Nails, binding wire, fasteners, tools, plumbing fittings',
   },
   {
     id: 'materials',
@@ -159,8 +184,41 @@ export const productCategories: ProductCategory[] = [
     defaultUnit: 'cft',
     schemaCategory: 'Building Materials',
     icon: 'materials',
+    photoPending: true,
+    typicalSpecs: 'Sand, stone chips and site materials — by cft or trolley',
+  },
+  {
+    id: 'puja',
+    slug: 'puja-samagri',
+    name: 'Puja Samagri / Puja Materials',
+    shortDescription: 'Puja Samagri available here, at the counter alongside building materials.',
+    description:
+      'Puja Samagri available here. Tell us the items you need, how many sets, and which puja or festival they are for, and we will confirm what we can give you and the price on WhatsApp.',
+    uses: ['Household puja', 'Festival days', 'Housewarming', 'Shop opening'],
+    askFor: [
+      'The list of items you need',
+      'How many sets or pieces of each',
+      'Which puja or festival, and the date you need them by',
+    ],
+    units: [
+      { id: 'sets', label: 'sets' },
+      { id: 'items', label: 'items' },
+      { id: 'pieces', label: 'pieces' },
+      { id: 'other', label: 'other' },
+    ],
+    defaultUnit: 'sets',
+    schemaCategory: 'Religious Items',
+    icon: 'puja',
+    photoPending: true,
   },
 ];
+
+/** Categories that use the Puja details step (festival + required date) in the quote builder. */
+export const PUJA_CATEGORY_ID = 'puja';
+
+export function hasPujaLine(categoryIds: string[]): boolean {
+  return categoryIds.includes(PUJA_CATEGORY_ID);
+}
 
 export function findCategory(id: string): ProductCategory | undefined {
   return productCategories.find((c) => c.id === id || c.slug === id);
