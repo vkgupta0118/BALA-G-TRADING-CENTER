@@ -5,8 +5,11 @@ import {
   buildGenericMessage,
   buildQuoteMessage,
   emptyQuote,
+  formatRequiredDate,
   hasErrors,
+  hasPujaLines,
   isValidQuantity,
+  isValidRequiredDate,
   MAX_NOTES,
   normalisePhone,
   OTHER_AREA,
@@ -22,6 +25,7 @@ const labels = {
   errName: 'name',
   errPhone: 'phone',
   errNotes: 'notes',
+  errRequiredDate: 'date',
 };
 
 const msgLabels = {
@@ -32,6 +36,8 @@ const msgLabels = {
   phone: 'Phone',
   notes: 'Notes',
   footer: 'Sent from the website.',
+  festival: 'Puja / festival',
+  requiredDate: 'Needed by',
 };
 
 function validForm(): QuoteForm {
@@ -45,6 +51,29 @@ function validForm(): QuoteForm {
     name: 'Rahul Das',
     phone: '98765 43210',
     notes: 'Need by Saturday',
+    festival: '',
+    requiredDate: '',
+  };
+}
+
+function pujaForm(): QuoteForm {
+  return {
+    lines: [
+      {
+        id: 'p1',
+        categoryId: 'puja',
+        spec: 'dhoop, batti, sindoor',
+        quantity: '3',
+        unit: 'sets',
+      },
+    ],
+    deliveryArea: 'Debidanga',
+    deliveryAreaOther: '',
+    name: 'Sita Devi',
+    phone: '9876543210',
+    notes: '',
+    festival: 'Lakshmi Puja',
+    requiredDate: '2026-10-12',
   };
 }
 
@@ -193,5 +222,67 @@ describe('Base path (GitHub Pages sub-path hosting)', () => {
     assert.equal(stripBase('/REPO/'), '/');
     assert.equal(stripBase('/REPO/products'), '/products');
     assert.equal(stripBase('/other'), '/other');
+  });
+});
+
+describe('Puja Samagri quote flow', () => {
+  it('detects puja lines so the extra step only appears when it is needed', () => {
+    assert.equal(hasPujaLines(pujaForm()), true);
+    assert.equal(hasPujaLines(validForm()), false);
+    assert.equal(hasPujaLines(emptyQuote()), false);
+  });
+
+  it('puts the festival and the required date into the WhatsApp message', () => {
+    const message = buildQuoteMessage(pujaForm(), 'Balajee Trading', msgLabels);
+    assert.match(message, /• Puja Samagri \/ Puja Materials \(dhoop, batti, sindoor\): 3 sets/);
+    assert.match(message, /Puja \/ festival: Lakshmi Puja/);
+    assert.match(message, /Needed by: 12 Oct 2026/);
+    assert.match(message, /Delivery area: Debidanga/);
+  });
+
+  it('leaves puja details out of a message with no puja line', () => {
+    const message = buildQuoteMessage(
+      { ...validForm(), festival: 'Durga Puja', requiredDate: '2026-10-12' },
+      'Balajee Trading',
+      msgLabels,
+    );
+    assert.doesNotMatch(message, /Puja \/ festival/);
+    assert.doesNotMatch(message, /Needed by/);
+  });
+
+  it('omits an empty festival or date rather than printing a blank label', () => {
+    const message = buildQuoteMessage(
+      { ...pujaForm(), festival: '', requiredDate: '' },
+      'Balajee Trading',
+      msgLabels,
+    );
+    assert.doesNotMatch(message, /Puja \/ festival/);
+    assert.doesNotMatch(message, /Needed by/);
+    assert.match(message, /• Puja Samagri/);
+  });
+
+  it('accepts today or a future date and rejects a past one', () => {
+    const today = new Date(2026, 8, 21);
+    assert.equal(isValidRequiredDate('', today), true, 'empty is allowed');
+    assert.equal(isValidRequiredDate('2026-09-21', today), true, 'today is allowed');
+    assert.equal(isValidRequiredDate('2026-10-12', today), true);
+    assert.equal(isValidRequiredDate('2026-09-20', today), false, 'yesterday is rejected');
+    assert.equal(isValidRequiredDate('not-a-date', today), false);
+  });
+
+  it('reports a past required date through validation', () => {
+    const errors = validateQuote({ ...pujaForm(), requiredDate: '2020-01-01' }, labels);
+    assert.equal(errors.requiredDate, 'date');
+    assert.equal(hasErrors(errors), true);
+  });
+
+  it('a complete puja request passes validation', () => {
+    assert.equal(hasErrors(validateQuote(pujaForm(), labels)), false);
+  });
+
+  it('formats the required date for a human, not as an ISO string', () => {
+    assert.equal(formatRequiredDate('2026-10-12'), '12 Oct 2026');
+    assert.equal(formatRequiredDate('2026-01-05'), '5 Jan 2026');
+    assert.equal(formatRequiredDate('garbage'), 'garbage');
   });
 });
