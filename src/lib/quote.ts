@@ -1,4 +1,4 @@
-import { findCategory, UNIT_LABELS, type UnitId } from '@/config/products';
+import { findCategory, PUJA_CATEGORY_ID, UNIT_LABELS, type UnitId } from '@/config/products';
 
 /**
  * Quote builder domain logic: types, validation and the WhatsApp message.
@@ -21,10 +21,14 @@ export interface QuoteForm {
   name: string;
   phone: string;
   notes: string;
+  /** Puja Samagri only: which puja or festival the items are for. */
+  festival: string;
+  /** Puja Samagri only: ISO date (yyyy-mm-dd) the customer needs the items by. */
+  requiredDate: string;
 }
 
 export type QuoteErrors = Partial<
-  Record<'lines' | 'deliveryArea' | 'name' | 'phone' | 'notes', string>
+  Record<'lines' | 'deliveryArea' | 'name' | 'phone' | 'notes' | 'requiredDate', string>
 > & {
   lineErrors?: Record<string, { quantity?: string; spec?: string }>;
 };
@@ -36,6 +40,7 @@ export type LabelSet = {
   errName: string;
   errPhone: string;
   errNotes: string;
+  errRequiredDate: string;
 };
 
 export const OTHER_AREA = '__other__';
@@ -56,7 +61,31 @@ export function newLine(categoryId: string): QuoteLine {
 }
 
 export function emptyQuote(): QuoteForm {
-  return { lines: [], deliveryArea: '', deliveryAreaOther: '', name: '', phone: '', notes: '' };
+  return {
+    lines: [],
+    deliveryArea: '',
+    deliveryAreaOther: '',
+    name: '',
+    phone: '',
+    notes: '',
+    festival: '',
+    requiredDate: '',
+  };
+}
+
+/** True when the customer has added at least one Puja Samagri line. */
+export function hasPujaLines(form: QuoteForm): boolean {
+  return form.lines.some((line) => line.categoryId === PUJA_CATEGORY_ID);
+}
+
+/** Accepts an empty value, or a yyyy-mm-dd date that is today or later. */
+export function isValidRequiredDate(value: string, today = new Date()): boolean {
+  if (!value.trim()) return true;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return false;
+  const midnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  return parsed.getTime() >= midnight.getTime();
 }
 
 /** Accepts Indian mobiles (10 digits starting 6–9) with optional +91/0 prefix, or any 8–15 digit international number. */
@@ -91,6 +120,7 @@ export function validateQuote(form: QuoteForm, labels: LabelSet): QuoteErrors {
   if (form.name.trim().length < 2) errors.name = labels.errName;
   if (!normalisePhone(form.phone)) errors.phone = labels.errPhone;
   if (form.notes.length > MAX_NOTES) errors.notes = labels.errNotes;
+  if (!isValidRequiredDate(form.requiredDate)) errors.requiredDate = labels.errRequiredDate;
   return errors;
 }
 
@@ -110,6 +140,30 @@ export interface MessageLabels {
   phone: string;
   notes: string;
   footer: string;
+  /** Puja Samagri only – omitted from the message when no puja line is present. */
+  festival: string;
+  requiredDate: string;
+}
+
+/** yyyy-mm-dd -> "12 Oct 2026", so the shopkeeper reads a date rather than an ISO string. */
+export function formatRequiredDate(value: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const [y, m, d] = value.split('-').map(Number) as [number, number, number];
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  return `${d} ${months[m - 1]} ${y}`;
 }
 
 export function formatLine(line: QuoteLine): string {
@@ -133,6 +187,11 @@ export function buildQuoteMessage(
   parts.push(`${labels.materials}:`);
   for (const line of form.lines) parts.push(formatLine(line));
   parts.push('');
+  if (hasPujaLines(form)) {
+    if (form.festival.trim()) parts.push(`${labels.festival}: ${form.festival.trim()}`);
+    if (form.requiredDate.trim())
+      parts.push(`${labels.requiredDate}: ${formatRequiredDate(form.requiredDate)}`);
+  }
   parts.push(`${labels.deliveryArea}: ${resolvedArea(form)}`);
   parts.push(`${labels.name}: ${form.name.trim()}`);
   parts.push(`${labels.phone}: +${normalisePhone(form.phone)}`);
