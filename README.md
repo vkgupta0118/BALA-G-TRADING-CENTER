@@ -51,6 +51,7 @@ Other commands:
 | `npm run test:e2e` | Playwright (desktop + Pixel 7): quote validation, WhatsApp link/message, call & directions links, keyboard navigation, sticky bar, SEO, i18n. Builds with test placeholder numbers first. |
 | `npm run screenshots` | Full-page + viewport screenshots at 375/768/1024/1440 → `screenshots/`, and asserts no horizontal overflow. |
 | `npm run verify` | typecheck → lint → unit → build → e2e. |
+| `npm run assets` | Regenerates any missing binary assets (WOFF font subsets from `google/fonts`, favicon/touch icons, OG image) with Python (`pip install fonttools pillow`). Committed files are kept; use `-- --force` to rebuild. CI runs this automatically. |
 
 ---
 
@@ -126,7 +127,7 @@ src/
                LocationSection, PageHeader, Reveal, icons, scene/ (LazyScene, MaterialsScene, SceneFallback)
   pages/   HomePage, ProductsPage, QuotePage, ContactPage, NotFoundPage
   styles/  tokens.css, base.css, components.css, scene.css
-public/    fonts (OFL, self-hosted), favicon, icons, og-image, manifest
+public/    fonts (OFL, self-hosted), favicon, icons, og-image (binaries reproducible via scripts/assets/generate.py)
 tests/     unit/, e2e/, screenshots/
 docs/      growth plan, GBP checklist, design decisions
 design-system/             generated MASTER.md from ui-ux-pro-max

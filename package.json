@@ -18,7 +18,8 @@
     "test:e2e:ui": "playwright test --ui",
     "screenshots": "playwright test --config playwright.screenshots.config.ts",
     "verify": "npm run typecheck && npm run lint && npm run test:unit && npm run build && npm run test:e2e",
-    "test:unit": "node scripts/test-unit.mjs"
+    "test:unit": "node scripts/test-unit.mjs",
+    "assets": "node scripts/assets/run.mjs"
   },
   "dependencies": {
     "react": "19.2.6",
