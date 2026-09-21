@@ -12,7 +12,7 @@ type JsonLd = Record<string, unknown>;
 export function hardwareStoreJsonLd(): JsonLd {
   const data: JsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'HardwareStore',
+    '@type': ['LocalBusiness', 'HardwareStore'],
     '@id': `${absoluteUrl('/')}#business`,
     name: site.name,
     alternateName: site.legalNameAlternatives,
@@ -47,6 +47,16 @@ export function hardwareStoreJsonLd(): JsonLd {
     }));
   }
   if (site.showBrands) data.brand = site.brands.map((b) => ({ '@type': 'Brand', name: b }));
+  if (site.pujaCounterName) {
+    data.department = [
+      {
+        '@type': 'LocalBusiness',
+        name: site.pujaCounterName,
+        description: 'Puja Samagri available here.',
+        address: data.address,
+      },
+    ];
+  }
   const sameAs = [site.social.facebook, site.social.instagram].filter(Boolean);
   if (sameAs.length) data.sameAs = sameAs;
   return data;
