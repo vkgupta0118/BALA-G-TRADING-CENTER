@@ -16,13 +16,13 @@ Nothing below is guessed. Until each item is supplied, the site shows an honest 
 | # | Item | Where it goes | Current state |
 |---|---|---|---|
 | 1 | **Verified WhatsApp Business number** (E.164 digits) | `.env.production` → `PUBLIC_WHATSAPP_E164` | **Set: 919339188629** (93391 88629, confirmed by the owner on 20 Sep 2026). Make sure WhatsApp Business runs on this SIM. |
-| 2 | Click-to-call number | `.env.production` → `PUBLIC_PHONE_E164` | **Set: 919339188629** (same number). |
+| 2 | Click-to-call number | `.env.production` → `PUBLIC_PHONE_E164` | **Set: 917908246939** (79082 46939, the number printed on the shop's visiting card; confirmed by the owner on 21 Sep 2026). WhatsApp and Call are deliberately different numbers. |
 | 3 | **Domain** | `.env.production` → `PUBLIC_SITE_URL` + `PUBLIC_BASE_PATH` | Set to the free GitHub Pages address `https://vkgupta0118.github.io/BALA-G-TRADING-CENTER`. Buy a custom domain later (e.g. `balajeetrading.in`) and update both values. |
-| 4 | **Final business name spelling** | `.env` → `PUBLIC_BUSINESS_NAME` | Defaults to *M/S Balajee Trading Centre*. Google shows *M.S. BALA G TRADING CENTER* — pick one and fix Google to match. |
-| 5 | **Business hours** for every day | `src/config/site.ts` → `openingHours`, then `PUBLIC_HOURS_VERIFIED=true` | Draft (Mon–Sat 8:00–20:00 from the Google hint "Opens 8 am Mon") is **hidden** until verified. |
-| 6 | **Delivery areas** and whether delivery is offered | `src/config/site.ts` → `serviceAreas`; `PUBLIC_DELIVERY_VERIFIED=true` | Localities are only a picker list; the site says delivery is "confirmed on your quote" until verified. |
-| 7 | **Product list / brands stocked** | `src/config/products.ts`; `src/config/site.ts` → `brands`; `PUBLIC_SHOW_BRANDS=true` | Categories live; brands section hidden. Never claim "authorised dealer" without documentation. |
-| 8 | **Original photos** (15+) | `public/images/` and Google Business Profile | None yet. No brand imagery or map screenshots are used. |
+| 4 | **Final business name spelling** | `.env` → `PUBLIC_BUSINESS_NAME` | **Set: M/S Balajee Trading Centre** (as printed on the visiting card). Google still shows *M.S. BALA G TRADING CENTER* — correct the Google Business Profile to match. |
+| 5 | **Business hours** for every day | `src/config/site.ts` → `openingHours`, then `PUBLIC_HOURS_VERIFIED=true` | **Verified 21 Sep 2026: open every day, 8:00–18:00** (`PUBLIC_HOURS_VERIFIED=true`). Shown in the hero, contact page and JSON-LD. |
+| 6 | **Delivery areas** and whether delivery is offered | `src/config/site.ts` → `serviceAreas`; `PUBLIC_DELIVERY_VERIFIED=true` | **Delivery confirmed by the owner** (`PUBLIC_DELIVERY_VERIFIED=true`). The site says "We deliver across Siliguri" and never "same-day". Localities remain a picker list. |
+| 7 | **Product list / brands stocked** | `src/config/products.ts`; `src/config/site.ts` → `brands`; `PUBLIC_SHOW_BRANDS=true` | Six categories incl. **Puja Samagri** (counter name `PUBLIC_PUJA_COUNTER_NAME=Vikash Store`). Cement brands listed are the five printed on the visiting card; the site never says "authorised dealer". |
+| 8 | **Original photos** | `assets-source/photos/` → `npm run images` → `public/images/` | 5 owner photos in use (bricks, cement stock ×3, visiting card). **7 more needed** — see `docs/image-asset-plan.md`. No Google Maps imagery is used. |
 | 9 | Logo (if one exists) | Replace `public/favicon.svg`, `apple-touch-icon.png`, `icon-512.png`, `og-image.png`, and `BrandMark` in `src/components/Header.tsx` | A neutral brick-mark placeholder is used. |
 | 10 | Analytics IDs (optional) | `.env` → `PUBLIC_GA4_MEASUREMENT_ID`, `PUBLIC_GOOGLE_ADS_ID`, `PUBLIC_META_PIXEL_ID` | Empty → no third-party scripts load at all. |
 | 11 | Privacy / contact email | `.env` → `PUBLIC_CONTACT_EMAIL` | Empty → not displayed. |
@@ -51,6 +51,7 @@ Other commands:
 | `npm run test:e2e` | Playwright (desktop + Pixel 7): quote validation, WhatsApp link/message, call & directions links, keyboard navigation, sticky bar, SEO, i18n. Builds with test placeholder numbers first. |
 | `npm run screenshots` | Full-page + viewport screenshots at 375/768/1024/1440 → `screenshots/`, and asserts no horizontal overflow. |
 | `npm run verify` | typecheck → lint → unit → build → e2e. |
+| `npm run images` | Builds the responsive AVIF/WebP/JPEG photographs in `public/images/` from the shop's originals in `assets-source/photos/` (needs Python + Pillow). Run once after cloning; CI runs it on every build. Add `-- --force` to rebuild. See `docs/image-asset-plan.md`. |
 | `npm run assets` | Regenerates any missing binary assets (WOFF font subsets from `google/fonts`, favicon/touch icons, OG image) with Python (`pip install fonttools pillow`). Committed files are kept; use `-- --force` to rebuild. CI runs this automatically. |
 
 ---
@@ -124,10 +125,12 @@ src/
   i18n/    en.ts, bn.ts, index.tsx
   seo/     jsonld.ts, pages.ts
   components/  Header, Footer, StickyBar, ConversionLinks, ConsentBanner, DevConfigBanner,
-               LocationSection, PageHeader, Reveal, icons, scene/ (LazyScene, MaterialsScene, SceneFallback)
+               LocationSection, PageHeader, Reveal, Picture (responsive <picture> + photo-pending panel), icons
   pages/   HomePage, ProductsPage, QuotePage, ContactPage, NotFoundPage
-  styles/  tokens.css, base.css, components.css, scene.css
-public/    fonts (OFL, self-hosted), favicon, icons, og-image (binaries reproducible via scripts/assets/generate.py)
+  styles/  tokens.css, base.css, components.css
+public/    fonts (OFL, self-hosted), favicon, icons, og-image (reproducible via scripts/assets/generate.py)
+           images/ - responsive photo derivatives, generated by scripts/assets/images.py (not committed)
+assets-source/photos/   the shop's own photographs, the single source for public/images/
 tests/     unit/, e2e/, screenshots/
 docs/      growth plan, GBP checklist, design decisions
 design-system/             generated MASTER.md from ui-ux-pro-max

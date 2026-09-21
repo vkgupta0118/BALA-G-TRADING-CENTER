@@ -12,5 +12,9 @@ blob-report/
 .DS_Store
 Thumbs.db
 
+# Responsive photo derivatives - regenerated from assets-source/photos by `npm run images`
+/public/images/
+
 # Generated proof-of-work images (kept in E:\AI\siliguri, not in git)
 /screenshots/
+/screenshots-before/
