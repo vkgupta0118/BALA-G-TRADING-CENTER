@@ -1169,3 +1169,225 @@
     transition: none;
   }
 }
+
+/* Photographs --------------------------------------------------------- */
+/* Every photograph reserves its box from the intrinsic width/height attributes
+   set by <Picture>, so nothing on the page moves while images load. */
+picture {
+  display: block;
+}
+picture img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  background: var(--stone-200);
+}
+
+/* Image-led hero ------------------------------------------------------ */
+.hero-media {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgb(255 255 255 / 0.1);
+}
+.hero-media img {
+  aspect-ratio: 4 / 3;
+}
+.hero-media figcaption {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-4) var(--space-3);
+  background: linear-gradient(to top, rgb(12 10 9 / 0.85), transparent);
+  color: var(--stone-100);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.hero-media figcaption .icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--gold-400);
+}
+
+/* "Open every day" badge sits with the hero copy, not over the photo. */
+.hours-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: rgb(14 117 102 / 0.18);
+  border: 1px solid var(--whatsapp-700);
+  color: #7fd9c7;
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+.hours-badge .icon {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* Category card media ------------------------------------------------- */
+.card-media {
+  margin: calc(var(--space-6) * -1) calc(var(--space-6) * -1) 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
+}
+.card-media img {
+  aspect-ratio: 4 / 3;
+}
+
+/* Honest stand-in for a category the owner has not photographed yet. */
+.photo-pending {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  aspect-ratio: 4 / 3;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--stone-100) 0 12px,
+    var(--stone-200) 12px 24px
+  );
+  color: var(--stone-600);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: var(--space-4);
+}
+.photo-pending .icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--stone-500);
+}
+.card-dark .photo-pending {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--charcoal-800) 0 12px,
+    var(--charcoal-700) 12px 24px
+  );
+  color: var(--stone-300);
+}
+
+.card-specs {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.card-specs strong {
+  display: block;
+  color: var(--text);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.card-dark .card-specs,
+.card-dark .card-specs strong {
+  color: var(--stone-300);
+}
+
+/* How to order -------------------------------------------------------- */
+.steps {
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  counter-reset: step;
+}
+.step {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: 3px solid var(--gold-400);
+  counter-increment: step;
+}
+.step::before {
+  content: counter(step);
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  line-height: 1;
+  color: var(--accent);
+}
+:lang(bn) .step::before {
+  font-family: var(--font-bn);
+  font-weight: 800;
+}
+.step h3 {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+.step p {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+/* Puja Samagri note --------------------------------------------------- */
+.puja-note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--gold-100);
+  border: 1px solid var(--gold-500);
+  color: var(--charcoal-950);
+  font-weight: 600;
+}
+.puja-note .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--gold-700);
+  flex: none;
+}
+
+/* Visiting card on Contact -------------------------------------------- */
+.card-scan {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  max-width: 26rem;
+}
+
+/* Mobile: guarantee the sticky bar never sits over a button ------------ */
+/* The hero's two CTAs must both clear the fixed bar on a 375x812 screen, so the
+   hero rhythm tightens below 64em rather than letting the secondary button land
+   in the band the bar occupies. Measured at 375px: both buttons end above it. */
+@media (max-width: 63.99em) {
+  .hero .container {
+    padding-block: var(--space-8) calc(var(--space-12) + var(--sticky-h));
+    gap: var(--space-8);
+  }
+  .hero-copy {
+    gap: var(--space-4);
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 1.3rem + 3vw, 2.75rem);
+  }
+  .hero .btn-lg {
+    min-height: 3.25rem;
+    font-size: var(--text-base);
+  }
+  .hero-points {
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+  }
+  /* Anything scrolled to programmatically stops clear of the bar. */
+  :target,
+  .btn,
+  .input,
+  .select,
+  .textarea {
+    scroll-margin-bottom: calc(var(--sticky-h) + var(--space-4));
+  }
+  .form-panel {
+    margin-bottom: var(--space-6);
+  }
+}
