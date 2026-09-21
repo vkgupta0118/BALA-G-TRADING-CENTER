@@ -19,6 +19,8 @@ export const en = {
   'cta.directions': 'Directions',
   'cta.getQuote': 'Get a quote',
   'cta.requestPrice': "Request today's price",
+  'cta.todaysPrice': "Get today's price",
+  'cta.callShop': 'Call shop',
   'cta.viewProducts': 'View products',
   'cta.copyMessage': 'Copy message',
   'cta.copied': 'Copied',
@@ -32,14 +34,16 @@ export const en = {
   'config.phoneMissing': 'Phone number not configured',
 
   // Hero
-  'hero.eyebrow': 'Building materials · Champasari Road, Siliguri',
-  'hero.title': 'Cement, bricks and TMT steel for your site in Siliguri',
+  'hero.eyebrow': 'Debidanga Bazar · Champasari Road, Siliguri',
+  'hero.title': 'Cement, bricks and TMT rods, priced the same day',
   'hero.subtitle':
-    'M/S Balajee Trading Centre supplies homeowners, masons and contractors across Siliguri from Debidanga Bazar. Send your material list on WhatsApp and get today’s price.',
+    'Send your material list on WhatsApp and we reply with today’s rate. Open every day, 8 am to 6 pm, at Debidanga Bazar on Champasari Road.',
   'hero.point1': 'Cement, bricks, TMT rods, hardware',
   'hero.point2': 'Quotes answered on WhatsApp',
-  'hero.point3': 'Shop on Champasari Road, Debidanga',
-  'hero.sceneLabel': 'Illustration of stacked bricks, cement bags and steel rods',
+  'hero.point3': 'We deliver across Siliguri',
+  'hero.imageAlt':
+    'Stack of red clay bricks in the yard at M/S Balajee Trading Centre, Debidanga Bazar',
+  'hero.openNow': 'Open every day · 8 am – 6 pm',
 
   // Sections
   'products.title': 'What we supply',
@@ -51,6 +55,23 @@ export const en = {
   'products.requestCard.body':
     'Describe any building material and we will tell you if we can arrange it.',
   'products.requestCard.cta': 'Request a material',
+  'products.specs': 'Usual sizes and units',
+  'products.photoPending': 'Shop photo coming soon',
+  'products.photoPendingOf': 'Photograph of {name} coming soon',
+
+  'howTo.title': 'How to order',
+  'howTo.subtitle': 'Four steps, and the whole thing happens on WhatsApp.',
+  'howTo.1.title': 'Pick your materials',
+  'howTo.1.body': 'Choose the categories you need and add a quantity for each.',
+  'howTo.2.title': 'Tell us quantity and location',
+  'howTo.2.body': 'Add sizes or grades, then choose the locality the load is going to.',
+  'howTo.3.title': 'We confirm on WhatsApp',
+  'howTo.3.body': 'Your list opens in WhatsApp. We reply with today’s rate and what is in stock.',
+  'howTo.4.title': 'Collect or take delivery',
+  'howTo.4.body': 'Pick up at the shop, or we confirm delivery charges and timing with your quote.',
+
+  'puja.available': 'Puja Samagri available here.',
+  'puja.counterLine': '{counter} — Puja Samagri available at {business}.',
 
   'why.title': 'Why buy from Balajee Trading Centre',
   'why.1.title': 'One shop for the whole site',
@@ -121,6 +142,13 @@ export const en = {
   'quote.step1': 'Materials',
   'quote.step2': 'Delivery area',
   'quote.step3': 'Your details',
+  'quote.stepPuja': 'Puja details',
+  'quote.festival': 'Which puja or festival',
+  'quote.festivalHint': 'Optional — helps us understand what you need',
+  'quote.requiredDate': 'Needed by',
+  'quote.requiredDateHint': 'Optional — the date you need the items',
+  'quote.pujaHelp':
+    'For Puja Samagri, list the items you need in the specification box and set how many sets or pieces.',
   'quote.addMaterial': 'Add material',
   'quote.add': 'Add',
   'quote.remove': 'Remove',
@@ -151,6 +179,7 @@ export const en = {
   'quote.err.name': 'Enter your name (at least 2 characters).',
   'quote.err.phone': 'Enter a valid mobile number.',
   'quote.err.notes': 'Notes must be under 500 characters.',
+  'quote.err.requiredDate': 'Choose a date that is today or later.',
   'quote.charsLeft': '{n} characters left',
   'quote.categoryPrompt': 'Choose a category',
   'quote.linesSummary': '{n} material(s) added',
@@ -164,6 +193,8 @@ export const en = {
   'msg.name': 'Name',
   'msg.phone': 'Phone',
   'msg.notes': 'Notes',
+  'msg.festival': 'Puja / festival',
+  'msg.requiredDate': 'Needed by',
   'msg.footer': 'Sent from the website quote builder.',
   'msg.generic': 'Hello {business}, I would like to enquire about building materials.',
   'msg.product': 'Hello {business}, please share today’s price for {product}.',
