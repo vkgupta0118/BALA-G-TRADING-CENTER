@@ -1,0 +1,126 @@
+/* ------------------------------------------------------------------
+   Design tokens – "Industrial Confidence"
+   Source: design-system/balajee-trading-centre/MASTER.md (+ DECISIONS.md)
+   All colour pairs used for text pass WCAG AA (≥ 4.5:1) – see DECISIONS.md.
+   ------------------------------------------------------------------ */
+:root {
+  /* Palette */
+  --charcoal-950: #0c0a09;
+  --charcoal-900: #1c1917;
+  --charcoal-800: #292524;
+  --charcoal-700: #44403c;
+  --stone-600: #57534e;
+  --stone-500: #78716c;
+  --stone-400: #a8a29e;
+  --stone-300: #d6d3d1;
+  --stone-200: #e7e5e4;
+  --stone-100: #f5f5f4;
+  --stone-50: #fafaf9;
+  --white: #ffffff;
+
+  --gold-700: #a16207; /* text/buttons on light – 4.92:1 on white */
+  --gold-500: #ca8a04; /* decorative only */
+  --gold-400: #e3b341; /* text/highlights on charcoal – 8.99:1 */
+  --gold-100: #fdf3d7;
+
+  --steel-700: #2b5b84; /* links on light – 7.16:1 */
+  --steel-600: #35699a;
+  --steel-300: #8fb4d9; /* text on charcoal – 8.08:1 */
+  --steel-100: #e8ecf0;
+
+  --whatsapp-700: #0e7566; /* button bg, white text – 5.59:1 */
+  --whatsapp-800: #0b5f53;
+  --success-700: #15803d;
+  --danger-700: #b91c1c; /* 6.47:1 on white */
+  --danger-100: #fee2e2;
+
+  /* Semantic */
+  --bg: var(--stone-50);
+  --surface: var(--white);
+  --surface-2: var(--stone-100);
+  --surface-dark: var(--charcoal-900);
+  --surface-dark-2: var(--charcoal-800);
+  --text: var(--charcoal-950);
+  --text-muted: #475569;
+  --text-on-dark: var(--white);
+  --text-on-dark-muted: var(--stone-300);
+  --border: var(--stone-300);
+  --border-strong: var(--stone-500);
+  --primary: var(--charcoal-900);
+  --on-primary: var(--white);
+  --accent: var(--gold-700);
+  --accent-bright: var(--gold-400);
+  --on-accent: var(--white);
+  --link: var(--steel-700);
+  --ring: var(--steel-600);
+  --ring-on-dark: var(--gold-400);
+
+  /* Typography */
+  --font-display: "Bebas Neue", "Noto Sans Bengali", Impact, "Arial Narrow Bold", sans-serif;
+  --font-body:
+    "Source Sans 3", "Noto Sans Bengali", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-bn: "Noto Sans Bengali", system-ui, sans-serif;
+
+  --text-xs: 0.8125rem; /* 13px */
+  --text-sm: 0.9375rem; /* 15px */
+  --text-base: 1.0625rem; /* 17px – comfortable on phones */
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: clamp(1.75rem, 1.2rem + 1.6vw, 2.25rem);
+  --text-3xl: clamp(2.25rem, 1.5rem + 2.4vw, 3.25rem);
+  --text-display: clamp(2.75rem, 1.6rem + 3.4vw, 4.75rem);
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-normal: 1.55;
+
+  /* Spacing – spacious scale (density 3/10) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Shape & depth */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgb(12 10 9 / 0.06), 0 1px 3px rgb(12 10 9 / 0.08);
+  --shadow-md: 0 6px 16px -6px rgb(12 10 9 / 0.18), 0 2px 6px rgb(12 10 9 / 0.06);
+  --shadow-lg: 0 24px 48px -24px rgb(12 10 9 / 0.35);
+
+  /* Motion */
+  --dur-fast: 150ms;
+  --dur: 250ms;
+  --dur-slow: 400ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Layout */
+  --container: 76rem; /* 1216px */
+  --gutter: 1rem;
+  --header-h: 4rem;
+  --sticky-h: 4.5rem;
+  --touch: 2.75rem; /* 44px minimum */
+  --touch-lg: 3rem; /* 48px */
+}
+
+@media (min-width: 48em) {
+  :root {
+    --gutter: 1.5rem;
+  }
+}
+
+@media (min-width: 64em) {
+  :root {
+    --gutter: 2rem;
+    --header-h: 4.5rem;
+  }
+}
