@@ -227,6 +227,15 @@ export const HardwareIcon = (p: IconProps) => (
   </Svg>
 );
 
+/** Lit diya (oil lamp) – Puja Samagri. */
+export const PujaIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 15h16a5 5 0 0 1-5 4H9a5 5 0 0 1-5-4Z" />
+    <path d="M12 15c0-2 2-3 2-5a2 2 0 0 0-4 0c0 2 2 3 2 5Z" />
+    <path d="M12 4.5V3" />
+  </Svg>
+);
+
 export const MaterialsIcon = (p: IconProps) => (
   <Svg {...p}>
     <path d="m12 3 9 5-9 5-9-5 9-5Z" />
@@ -241,4 +250,5 @@ export const categoryIcons = {
   steel: SteelIcon,
   hardware: HardwareIcon,
   materials: MaterialsIcon,
+  puja: PujaIcon,
 } as const;
