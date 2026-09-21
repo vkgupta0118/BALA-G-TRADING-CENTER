@@ -1,6 +1,6 @@
-# Completion report — 20 September 2026
+# Completion report — 20–21 September 2026
 
-Project: `balajee-trading-centre-site` (delivered to `E:\AI\siliguri`)
+Project: `balajee-trading-centre-site` — live at https://vkgupta0118.github.io/BALA-G-TRADING-CENTER/ · source `github.com/vkgupta0118/BALA-G-TRADING-CENTER` · local copy `E:\AI\siliguri`
 
 ## What was verified in this session (actually run, not described)
 
@@ -68,14 +68,39 @@ screenshots/        36 PNGs (4 pages × 4 widths, full-page + viewport, plus Ben
 9. **Privacy/contact email** → `PUBLIC_CONTACT_EMAIL`.
 10. **Real testimonials** with permission → `src/config/site.ts`.
 
+## Update — 21 Sep 2026: the site is LIVE
+
+**Live URL: https://vkgupta0118.github.io/BALA-G-TRADING-CENTER/**
+
+Deployed from GitHub Actions run #2 (`workflow_dispatch`, commit `0785165`). All three jobs green: `build` 28s, `e2e` 1m 4s, `deploy` 11s.
+
+Getting there took one detour worth recording: run #1 failed at the `actions/configure-pages` step with *"Create Pages site failed — Resource not accessible by integration"*. The workflow's `GITHUB_TOKEN` can attach to an existing Pages site but cannot create one, so `enablement: true` is not enough on a repo where Pages has never been switched on. Fix: *Settings → Pages → Build and deployment → Source → GitHub Actions* (done 21 Sep), then re-run. Everything before that step had already passed in run #1, so the failure was purely the hosting switch, not the build.
+
+### Verified on the live URL (not inferred — checked in a browser against the deployed site)
+- **Pages render with real pre-rendered HTML:** `/` (h1 "Cement, bricks and TMT steel for your site in Siliguri"), `/products` (6 cards, anchors `#cement` … `#tmt-rods-steel`, h1 "What we supply"), `/quote` (form present, 5 category buttons, 17 delivery-area options), `/contact` (enquiry form present, hours still showing the unverified "call to confirm" state).
+- **WhatsApp number:** 11 `wa.me` links on the home page, every one of them on `919339188629` and no other number anywhere in the markup.
+- **Click-to-call:** `tel:+919339188629`.
+- **Sub-path hosting works:** canonical `…/BALA-G-TRADING-CENTER/`, all nav links base-prefixed, client-side routing intact.
+- **SEO files:** `robots.txt` serves `Sitemap: https://vkgupta0118.github.io/BALA-G-TRADING-CENTER/sitemap.xml`; `sitemap.xml` lists the four public routes with today's `lastmod`; 3 JSON-LD blocks on the home page (HardwareStore, WebSite, FAQPage).
+- **404:** an unknown path returns the styled "Page not found" page.
+- **Assets:** all three self-hosted fonts loaded (`document.fonts.size === 3`); the CSS-3D materials scene and the mobile sticky bar are both present in the DOM; no horizontal overflow.
+- **CI quality gates on the deployed commit:** typecheck, Biome lint, 20 unit tests, `STRICT_ENV=1` production build, and the full 47-test Playwright suite (desktop + Pixel 7) all passed on GitHub's runners — including the font/icon/OG-image generation step, which rebuilt every binary asset from source in 4 seconds.
+
+### Repository upload integrity
+The sandbox could not `git push` (org egress policy blocks it) and the local VM has no GitHub access, so all 76 tracked text files were uploaded through GitHub's web upload form driven by Claude in Chrome. Each batch carried a byte-length + DJB2 checksum computed in the browser and compared against the value computed in the sandbox before the commit was allowed to proceed. Afterwards the repo was cloned back into the sandbox and diffed file-by-file: **all 76 files byte-identical**. Binary assets (WOFF subsets, PNG/ICO icons, OG image) are deliberately not committed — CI regenerates them reproducibly via `scripts/assets/generate.py`.
+
 ## Not verified / not claimed
-- No real WhatsApp number, domain, hosting, DNS, analytics account, Google Ads account or Google Business Profile change has been connected or tested end-to-end. The site is **not live**.
-- WhatsApp deep links were tested against a stubbed `wa.me` response in the test browser (the sandbox has no internet); the URL format is standard and unit-tested, but the final check must be a tap on a real phone after the number is configured.
-- Bengali copy was written by the assistant; have a Bengali-speaking staff member read `src/i18n/bn.ts` once before launch.
+- **The WhatsApp link has not been tapped on a real phone.** The URL format is unit-tested, E2E-tested against a stubbed `wa.me`, and confirmed on the live page to carry `919339188629` — but whether that SIM actually has WhatsApp Business running, and what the chat looks like when it opens, can only be confirmed by you tapping it on the phone. Do this first.
+- No custom domain, DNS, analytics account, Google Ads account, or Google Business Profile change has been connected. GA4/Meta/Ads IDs are empty, so no third-party script loads at all and no consent banner appears.
+- The Streamlit mirror has not been deployed; `streamlit_app.py` is ready but nobody has created the share.streamlit.io app.
+- Bengali copy was written by the assistant; have a Bengali-speaking staff member read `src/i18n/bn.ts` once before you push the site in ads.
+- Business hours, delivery promise, brands and testimonials remain hidden behind their `PUBLIC_*` flags because they are still unverified.
 
 ## Deployment steps
-1. `npm install` → `cp .env.example .env` → fill the verified values.
-2. `npm run verify` (all green) → `STRICT_ENV=1 npm run build` → deploy `dist/` to any static host (Netlify / Vercel / Cloudflare Pages / Nginx). Publish directory `dist`, build command `npm ci && STRICT_ENV=1 npm run build`.
-3. Confirm on a phone: WhatsApp, Call, Directions, quote submit, Bengali toggle.
-4. Google Search Console → submit `/sitemap.xml`. Google Business Profile → add website, follow `docs/google-business-profile-checklist.md`.
-5. Start week 1 of `docs/90-day-growth-plan.md` and the weekly scorecard.
+
+Deployment is now automatic: **push to `main` → GitHub Actions builds and publishes to GitHub Pages.** Nothing manual is required for a content change.
+
+1. Edit locally → `npm run verify` (all green) → commit and push to `main`. The workflow redeploys in about a minute.
+2. Confirm on a phone after the first deploy: WhatsApp, Call, Directions, quote submit, Bengali toggle.
+3. Google Search Console → submit `/sitemap.xml`. Google Business Profile → add website, follow `docs/google-business-profile-checklist.md`.
+4. Start week 1 of `docs/90-day-growth-plan.md` and the weekly scorecard.
