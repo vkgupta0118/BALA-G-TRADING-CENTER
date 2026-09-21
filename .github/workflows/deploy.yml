@@ -1,0 +1,96 @@
+# Builds the site and publishes dist/ to GitHub Pages on every push to main.
+# Public configuration (WhatsApp number, site URL, base path) lives in .env.production.
+name: Build and deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          npm install --no-audit --no-fund
+          pip install --quiet fonttools pillow
+
+      - name: Generate binary assets (fonts, icons, OG image) if not committed
+        run: npm run assets
+
+      - name: Type-check, lint, unit tests
+        run: |
+          npm run typecheck
+          npm run lint
+          npm run test:unit
+
+      - name: Build (fails if launch-critical config is missing)
+        run: npm run build
+        env:
+          STRICT_ENV: '1'
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  # End-to-end tests run alongside the deploy (they build their own copy with test placeholder numbers).
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          npm install --no-audit --no-fund
+          pip install --quiet fonttools pillow
+          npm run assets
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            test-results
+            playwright-report
+          retention-days: 7
