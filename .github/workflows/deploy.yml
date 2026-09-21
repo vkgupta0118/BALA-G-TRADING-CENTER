@@ -38,6 +38,9 @@ jobs:
       - name: Generate binary assets (fonts, icons, OG image) if not committed
         run: npm run assets
 
+      - name: Rebuild responsive photographs from assets-source/photos
+        run: npm run images
+
       - name: Type-check, lint, unit tests
         run: |
           npm run typecheck
@@ -84,6 +87,7 @@ jobs:
           npm install --no-audit --no-fund
           pip install --quiet fonttools pillow
           npm run assets
+          npm run images
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4
