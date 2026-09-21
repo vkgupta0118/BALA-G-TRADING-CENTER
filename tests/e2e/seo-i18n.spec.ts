@@ -20,7 +20,7 @@ test.describe('SEO & pre-rendering', () => {
       expect(html).toContain(
         `<link rel="canonical" href="${TEST_SITE_URL}${path === '/' ? '/' : path}">`,
       );
-      expect(html).toContain('"@type":"HardwareStore"');
+      expect(html).toContain('"@type":["LocalBusiness","HardwareStore"]');
       expect(html).toContain('property="og:image"');
       // Pre-rendered content (not an empty SPA shell)
       expect(html).toContain('<h1');
@@ -59,12 +59,40 @@ test.describe('SEO & pre-rendering', () => {
     }
   });
 
-  test('unverified facts stay hidden until the owner confirms them', async ({ page }) => {
+  test('owner-confirmed facts are stated, unconfirmed ones stay hidden', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByTestId('brands-section')).toHaveCount(0);
-    await expect(page.getByTestId('hours-unverified')).toBeVisible();
-    await expect(page.getByTestId('delivery-copy')).toContainText('confirmed on your quote');
+    // Confirmed on 2026-09-21: hours, delivery and the brands from the visiting card.
+    await expect(page.getByTestId('hours-badge')).toBeVisible();
+    await expect(page.getByTestId('hours-badge')).toContainText('8 am');
+    await expect(page.getByTestId('hours-unverified')).toHaveCount(0);
+    await expect(page.getByTestId('brands-section')).toBeVisible();
+    await expect(page.getByTestId('delivery-copy')).toContainText('We deliver');
+    // Still genuinely unverified: nobody has left a testimonial we have permission to use.
     await expect(page.getByTestId('reviews-empty')).toBeVisible();
+  });
+
+  test('opening hours reach structured data for every day of the week', async ({ request }) => {
+    const html = await (await request.get('/')).text();
+    expect(html).toContain('"openingHoursSpecification"');
+    expect(html).toContain('"opens":"08:00"');
+    expect(html).toContain('"closes":"18:00"');
+    for (const day of ['Monday', 'Saturday', 'Sunday']) expect(html).toContain(`"${day}"`);
+    // HardwareStore is declared alongside LocalBusiness so generic consumers match it.
+    expect(html).toContain('"@type":["LocalBusiness","HardwareStore"]');
+  });
+
+  test('Puja Samagri is claimed once, exactly as the owner approved', async ({ page }) => {
+    await page.goto('/');
+    const note = page.getByTestId('puja-note');
+    await expect(note).toBeVisible();
+    await expect(note).toHaveText(
+      'Vikash Store — Puja Samagri available at M/S Balajee Trading Centre.',
+    );
+    // No invented items, kits, festivals-with-prices or availability promises.
+    const body = await page.locator('body').innerText();
+    for (const invented of [/puja kit/i, /festival offer/i, /always in stock/i]) {
+      expect(body).not.toMatch(invented);
+    }
   });
 });
 
@@ -79,7 +107,7 @@ test.describe('English / Bengali', () => {
 
     await expect(page.locator('html')).toHaveAttribute('lang', 'bn');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('সিমেন্ট');
-    await expect(page.getByTestId('hero-quote-cta')).toContainText('দাম জানুন');
+    await expect(page.getByTestId('hero-quote-cta')).toContainText('আজকের দাম নিন');
     if (isMobile) await expect(page.getByTestId('sticky-whatsapp')).toContainText('হোয়াটসঅ্যাপে দাম');
 
     // WhatsApp message is generated in Bengali too
