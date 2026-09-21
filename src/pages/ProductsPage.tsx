@@ -1,6 +1,7 @@
 import { WhatsAppLink } from '@/components/ConversionLinks';
-import { ArrowRightIcon, CheckIcon, categoryIcons } from '@/components/icons';
+import { ArrowRightIcon, CheckIcon, categoryIcons, PujaIcon } from '@/components/icons';
 import { PageHeader } from '@/components/PageHeader';
+import { PhotoPending, Picture } from '@/components/Picture';
 import { Reveal } from '@/components/Reveal';
 import { productCategories } from '@/config/products';
 import { site } from '@/config/site';
@@ -19,16 +20,50 @@ export function ProductsPage() {
       />
       <section className="section" aria-label={t('nav.products')}>
         <div className="container">
+          <p
+            className="puja-note"
+            data-testid="puja-note"
+            style={{ marginBottom: 'var(--space-8)' }}
+          >
+            <PujaIcon />
+            <span>
+              {site.pujaCounterName
+                ? t('puja.counterLine', {
+                    counter: site.pujaCounterName,
+                    business: site.name,
+                  })
+                : t('puja.available')}
+            </span>
+          </p>
           <div className="grid grid-2">
             {productCategories.map((c) => {
               const Icon = categoryIcons[c.icon];
               return (
                 <Reveal as="article" className="card" id={c.slug} key={c.id}>
+                  {c.image && c.imageAlt ? (
+                    <div className="card-media">
+                      <Picture
+                        slug={c.image}
+                        alt={c.imageAlt}
+                        sizes="(min-width: 64em) 34rem, 92vw"
+                      />
+                    </div>
+                  ) : c.photoPending ? (
+                    <div className="card-media">
+                      <PhotoPending label={t('products.photoPendingOf', { name: c.name })} />
+                    </div>
+                  ) : null}
                   <div className="card-icon">
                     <Icon />
                   </div>
                   <h3>{c.name}</h3>
                   <p>{c.description}</p>
+                  {c.typicalSpecs ? (
+                    <p className="card-specs">
+                      <strong>{t('products.specs')}</strong>
+                      {c.typicalSpecs}
+                    </p>
+                  ) : null}
                   <div>
                     <h4 className="small" style={{ marginBottom: 'var(--space-2)' }}>
                       {t('products.uses')}
@@ -60,7 +95,7 @@ export function ProductsPage() {
                       className="btn btn-primary"
                       data-testid={`add-${c.id}`}
                     >
-                      {t('cta.getQuote')}
+                      {t('cta.todaysPrice')}
                       <ArrowRightIcon />
                     </Link>
                     <WhatsAppLink

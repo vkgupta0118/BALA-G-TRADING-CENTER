@@ -7,6 +7,7 @@ import {
   categoryIcons,
   InfoIcon,
   PlusIcon,
+  PujaIcon,
   TrashIcon,
   WhatsAppIcon,
 } from '@/components/icons';
@@ -19,6 +20,7 @@ import {
   buildQuoteMessage,
   emptyQuote,
   hasErrors,
+  hasPujaLines,
   MAX_LINES,
   MAX_NOTES,
   newLine,
@@ -128,6 +130,7 @@ export function QuotePage() {
       errName: t('quote.err.name'),
       errPhone: t('quote.err.phone'),
       errNotes: t('quote.err.notes'),
+      errRequiredDate: t('quote.err.requiredDate'),
     }),
     [t],
   );
@@ -142,6 +145,8 @@ export function QuotePage() {
         phone: t('msg.phone'),
         notes: t('msg.notes'),
         footer: t('msg.footer'),
+        festival: t('msg.festival'),
+        requiredDate: t('msg.requiredDate'),
       }),
     [form, t],
   );
@@ -175,10 +180,12 @@ export function QuotePage() {
     if (errors.name) list.push({ id: 'name', text: errors.name });
     if (errors.phone) list.push({ id: 'phone', text: errors.phone });
     if (errors.notes) list.push({ id: 'notes', text: errors.notes });
+    if (errors.requiredDate) list.push({ id: 'requiredDate', text: errors.requiredDate });
     return list;
   }, [errors]);
 
   const notesLeft = MAX_NOTES - form.notes.length;
+  const showPuja = hasPujaLines(form);
 
   return (
     <>
@@ -346,6 +353,65 @@ export function QuotePage() {
                 })}
               </div>
             </fieldset>
+
+            {/* Puja Samagri only – appears once a puja line is added */}
+            {showPuja ? (
+              <fieldset
+                style={{ border: 0, padding: 0, margin: 0, display: 'grid', gap: 'var(--space-4)' }}
+                data-testid="puja-fieldset"
+              >
+                <legend className="step-title">
+                  <span className="step-num" aria-hidden="true">
+                    <PujaIcon style={{ width: '1.1rem', height: '1.1rem' }} />
+                  </span>
+                  {t('quote.stepPuja')}
+                </legend>
+                <p className="muted small">{t('quote.pujaHelp')}</p>
+                <div className="form-row form-row-2">
+                  <div className="field">
+                    <label htmlFor="festival">{t('quote.festival')}</label>
+                    <input
+                      id="festival"
+                      className="input"
+                      value={form.festival}
+                      onChange={(e) => update('festival', e.target.value)}
+                      maxLength={80}
+                      aria-describedby="festival-hint"
+                      data-testid="festival-input"
+                    />
+                    <span className="hint" id="festival-hint">
+                      {t('quote.festivalHint')}
+                    </span>
+                  </div>
+                  <div className="field">
+                    <label htmlFor="requiredDate">{t('quote.requiredDate')}</label>
+                    <input
+                      id="requiredDate"
+                      className="input"
+                      type="date"
+                      value={form.requiredDate}
+                      onChange={(e) => update('requiredDate', e.target.value)}
+                      aria-invalid={errors.requiredDate ? true : undefined}
+                      aria-describedby={
+                        errors.requiredDate
+                          ? 'requiredDate-error requiredDate-hint'
+                          : 'requiredDate-hint'
+                      }
+                      data-testid="required-date-input"
+                    />
+                    <span className="hint" id="requiredDate-hint">
+                      {t('quote.requiredDateHint')}
+                    </span>
+                    {errors.requiredDate ? (
+                      <p className="field-error" id="requiredDate-error">
+                        <AlertIcon />
+                        {errors.requiredDate}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              </fieldset>
+            ) : null}
 
             {/* Step 2 – Delivery area */}
             <fieldset

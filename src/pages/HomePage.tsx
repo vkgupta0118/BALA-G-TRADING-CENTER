@@ -3,8 +3,10 @@ import {
   ArrowRightIcon,
   CheckCircleIcon,
   ChevronDownIcon,
+  ClockIcon,
   categoryIcons,
   MapPinIcon,
+  PujaIcon,
   ShieldIcon,
   StarIcon,
   StoreIcon,
@@ -13,8 +15,8 @@ import {
   WhatsAppIcon,
 } from '@/components/icons';
 import { LocationSection } from '@/components/LocationSection';
+import { PhotoPending, Picture } from '@/components/Picture';
 import { Reveal } from '@/components/Reveal';
-import { LazyScene } from '@/components/scene/LazyScene';
 import { productCategories } from '@/config/products';
 import { site } from '@/config/site';
 import { useI18n } from '@/i18n';
@@ -22,18 +24,26 @@ import { buildGenericMessage } from '@/lib/quote';
 import { Link } from '@/lib/router';
 import { faqItems } from '@/seo/pages';
 
+/**
+ * Hero: one photograph of the shop's own stock, one value proposition,
+ * one primary CTA ("Get today's price") and one secondary CTA ("Call shop").
+ * The photograph is the only eager image on the page.
+ */
 function Hero() {
   const { t } = useI18n();
-  const [first, ...rest] = t('hero.title').split(' ');
   return (
     <section className="hero on-dark" aria-labelledby="hero-title">
       <div className="container">
         <div className="hero-copy">
           <span className="eyebrow">{t('hero.eyebrow')}</span>
-          <h1 id="hero-title">
-            <em>{first}</em> {rest.join(' ')}
-          </h1>
+          <h1 id="hero-title">{t('hero.title')}</h1>
           <p className="lead">{t('hero.subtitle')}</p>
+          {site.hoursVerified ? (
+            <p className="hours-badge" data-testid="hours-badge">
+              <ClockIcon />
+              {t('hero.openNow')}
+            </p>
+          ) : null}
           <ul className="hero-points" role="list">
             <li>
               <CheckCircleIcon />
@@ -43,21 +53,35 @@ function Hero() {
               <CheckCircleIcon />
               {t('hero.point2')}
             </li>
-            <li>
-              <CheckCircleIcon />
-              {t('hero.point3')}
-            </li>
+            {site.deliveryVerified ? (
+              <li>
+                <CheckCircleIcon />
+                {t('hero.point3')}
+              </li>
+            ) : null}
           </ul>
           <div className="btn-group">
             <Link to="/quote" className="btn btn-accent btn-lg" data-testid="hero-quote-cta">
-              {t('cta.getQuote')}
+              {t('cta.todaysPrice')}
               <ArrowRightIcon />
             </Link>
-            <WhatsAppLink className="btn btn-whatsapp btn-lg" source="hero" />
-            <CallLink className="btn btn-outline btn-lg" source="hero" />
+            <CallLink className="btn btn-outline btn-lg" source="hero">
+              {t('cta.callShop')}
+            </CallLink>
           </div>
         </div>
-        <LazyScene />
+        <figure className="hero-media" data-testid="hero-media">
+          <Picture
+            slug="bricks-stack"
+            alt={t('hero.imageAlt')}
+            sizes="(min-width: 64em) 44vw, 100vw"
+            priority
+          />
+          <figcaption>
+            <MapPinIcon />
+            {site.landmark}
+          </figcaption>
+        </figure>
       </div>
     </section>
   );
@@ -77,12 +101,50 @@ function TrustStrip() {
           {t('hero.point2')}
         </div>
         <div className="trust-item">
-          <MapPinIcon />
-          {t('hero.point3')}
+          <ClockIcon />
+          {t('hero.openNow')}
         </div>
       </div>
     </section>
   );
+}
+
+/** The one sanctioned Puja Samagri claim, and nothing beyond it. */
+function PujaNote() {
+  const { t } = useI18n();
+  const counter = site.pujaCounterName;
+  return (
+    <p className="puja-note" data-testid="puja-note">
+      <PujaIcon />
+      <span>
+        {counter ? t('puja.counterLine', { counter, business: site.name }) : t('puja.available')}
+      </span>
+    </p>
+  );
+}
+
+/** Each category leads with its own photograph, or an honest "photo coming" panel. */
+function CategoryMedia({ category }: { category: (typeof productCategories)[number] }) {
+  const { t } = useI18n();
+  if (category.image && category.imageAlt) {
+    return (
+      <div className="card-media">
+        <Picture
+          slug={category.image}
+          alt={category.imageAlt}
+          sizes="(min-width: 64em) 22rem, (min-width: 48em) 45vw, 92vw"
+        />
+      </div>
+    );
+  }
+  if (category.photoPending) {
+    return (
+      <div className="card-media">
+        <PhotoPending label={t('products.photoPendingOf', { name: category.name })} />
+      </div>
+    );
+  }
+  return null;
 }
 
 function ProductCategories() {
@@ -100,39 +162,60 @@ function ProductCategories() {
             const Icon = categoryIcons[c.icon];
             return (
               <article className="card" key={c.id}>
+                <CategoryMedia category={c} />
                 <div className="card-icon">
                   <Icon />
                 </div>
                 <h3>{c.name}</h3>
                 <p>{c.shortDescription}</p>
+                {c.typicalSpecs ? (
+                  <p className="card-specs">
+                    <strong>{t('products.specs')}</strong>
+                    {c.typicalSpecs}
+                  </p>
+                ) : null}
                 <div className="card-actions">
                   <Link to={`/quote?add=${c.id}`} className="btn btn-primary">
-                    {t('cta.getQuote')}
+                    {t('cta.todaysPrice')}
                   </Link>
                   <WhatsAppLink
                     className="btn btn-ghost"
                     source={`home_category_${c.id}`}
                     message={buildGenericMessage(site.name, t('msg.product', { product: c.name }))}
                   >
-                    {t('cta.requestPrice')}
+                    {t('cta.whatsapp')}
                   </WhatsAppLink>
                 </div>
               </article>
             );
           })}
-          <article className="card card-dark">
-            <div className="card-icon">
-              <ArrowRightIcon />
-            </div>
-            <h3>{t('products.requestCard.title')}</h3>
-            <p>{t('products.requestCard.body')}</p>
-            <div className="card-actions">
-              <Link to="/quote?add=materials" className="btn btn-accent">
-                {t('products.requestCard.cta')}
-              </Link>
-            </div>
-          </article>
         </div>
+        <PujaNote />
+      </div>
+    </Reveal>
+  );
+}
+
+/** Four plain steps, so nobody has to guess what happens after they tap the button. */
+function HowToOrder() {
+  const { t } = useI18n();
+  const steps = [1, 2, 3, 4] as const;
+  return (
+    <Reveal as="section" className="section section-alt" aria-labelledby="howto-title">
+      <div className="container">
+        <div className="section-head">
+          <span className="eyebrow">WhatsApp</span>
+          <h2 id="howto-title">{t('howTo.title')}</h2>
+          <p className="lead">{t('howTo.subtitle')}</p>
+        </div>
+        <ol className="steps" role="list" data-testid="how-to-order">
+          {steps.map((n) => (
+            <li className="step" key={n}>
+              <h3>{t(`howTo.${n}.title`)}</h3>
+              <p>{t(`howTo.${n}.body`)}</p>
+            </li>
+          ))}
+        </ol>
       </div>
     </Reveal>
   );
@@ -175,7 +258,7 @@ function WhyUs() {
 function DeliveryAndBrands() {
   const { t } = useI18n();
   return (
-    <Reveal as="section" className="section section-alt" aria-labelledby="delivery-title">
+    <Reveal as="section" className="section" aria-labelledby="delivery-title">
       <div className="container">
         <div className="grid grid-2">
           <article className="card">
@@ -188,12 +271,19 @@ function DeliveryAndBrands() {
             </p>
             <div className="card-actions">
               <Link to="/quote" className="btn btn-primary">
-                {t('cta.getQuote')}
+                {t('cta.todaysPrice')}
               </Link>
             </div>
           </article>
           {site.showBrands ? (
             <article className="card" data-testid="brands-section">
+              <div className="card-media">
+                <Picture
+                  slug="cement-brands"
+                  alt="UltraTech Premium and Ambuja cement bags stacked in the godown at Balajee Trading Centre"
+                  sizes="(min-width: 64em) 30rem, 92vw"
+                />
+              </div>
               <div className="card-icon">
                 <ShieldIcon />
               </div>
@@ -214,13 +304,6 @@ function DeliveryAndBrands() {
               </div>
               <h3>{t('area.title')}</h3>
               <p>{t('area.body')}</p>
-              <ul className="tag-list" role="list" aria-label="Areas">
-                {site.serviceAreas.slice(0, 8).map((a) => (
-                  <li className="tag" key={a}>
-                    {a}
-                  </li>
-                ))}
-              </ul>
             </article>
           )}
         </div>
@@ -242,7 +325,7 @@ function QuoteBand() {
         </div>
         <div className="btn-group">
           <Link to="/quote" className="btn btn-accent btn-lg">
-            {t('cta.getQuote')}
+            {t('cta.todaysPrice')}
             <ArrowRightIcon />
           </Link>
           <WhatsAppLink className="btn btn-whatsapp btn-lg" source="quote_band" />
@@ -254,7 +337,6 @@ function QuoteBand() {
 
 function ServiceArea() {
   const { t } = useI18n();
-  if (!site.showBrands) return null; // area card already shown in DeliveryAndBrands when brands are hidden
   return (
     <Reveal as="section" className="section" aria-labelledby="area-title">
       <div className="container">
@@ -278,7 +360,7 @@ function ServiceArea() {
 function Reviews() {
   const { t } = useI18n();
   return (
-    <Reveal as="section" className="section" aria-labelledby="reviews-title">
+    <Reveal as="section" className="section section-alt" aria-labelledby="reviews-title">
       <div className="container">
         <div className="section-head">
           <span className="eyebrow">Google</span>
@@ -297,9 +379,6 @@ function Reviews() {
             <div className="btn-group">
               <DirectionsLink className="btn btn-primary" source="reviews_read">
                 {t('reviews.readGoogle')}
-              </DirectionsLink>
-              <DirectionsLink className="btn btn-outline" source="reviews_write">
-                {t('reviews.leaveGoogle')}
               </DirectionsLink>
             </div>
           </div>
@@ -325,7 +404,7 @@ function Faq() {
   const { t, lang } = useI18n();
   const items = faqItems(lang);
   return (
-    <Reveal as="section" className="section section-alt" aria-labelledby="faq-title">
+    <Reveal as="section" className="section" aria-labelledby="faq-title">
       <div className="container">
         <div className="section-head">
           <span className="eyebrow">FAQ</span>
@@ -353,6 +432,7 @@ export function HomePage() {
       <Hero />
       <TrustStrip />
       <ProductCategories />
+      <HowToOrder />
       <WhyUs />
       <DeliveryAndBrands />
       <QuoteBand />
