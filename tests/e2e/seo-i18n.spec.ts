@@ -1,5 +1,5 @@
 import { expect, test } from 'playwright/test';
-import { TEST_SITE_URL } from '../../playwright.config';
+import { TEST_SITE_URL, TEST_SITE_VERIFICATION } from '../../playwright.config';
 
 test.describe('SEO & pre-rendering', () => {
   test('each route ships real HTML with title, description, canonical and JSON-LD', async ({
@@ -73,6 +73,16 @@ test.describe('SEO & pre-rendering', () => {
       'content',
       `${TEST_SITE_URL}/products/`,
     );
+  });
+
+  test('Search Console verification tag is served once, in <head>, on the home page', async ({
+    request,
+  }) => {
+    const html = await (await request.get('/')).text();
+    const head = html.slice(0, html.indexOf('</head>'));
+    const tag = `<meta name="google-site-verification" content="${TEST_SITE_VERIFICATION}">`;
+    expect(head).toContain(tag);
+    expect(html.split('google-site-verification').length - 1).toBe(1);
   });
 
   test('no false claims appear anywhere on the site', async ({ page }) => {
