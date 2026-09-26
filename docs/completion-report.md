@@ -291,3 +291,14 @@ routing change was needed.
 Tests: 1 new unit test (9 cases, 29 total) and 1 new E2E test (every internal page
 link and `og:url` end in `/`, run on desktop and Pixel 7 — 76 E2E total); the
 canonical, sitemap and two URL assertions were updated. `npm run verify` exit 0.
+
+## Search Console verification tag
+
+The owner started a URL-prefix property for
+`https://vkgupta0118.github.io/BALA-G-TRADING-CENTER/` and chose HTML-tag
+verification. The token lives in `.env.production` as
+`PUBLIC_GOOGLE_SITE_VERIFICATION` (configurable like every other provider ID,
+never hard-coded in a component) and `renderHeadTags()` emits
+`<meta name="google-site-verification" content="…">` in each page's `<head>` when
+it is set. A malformed value is ignored rather than injected. New E2E test: the
+tag appears exactly once, inside `<head>`, on the home page.
