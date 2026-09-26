@@ -21,6 +21,7 @@ interface ImportMetaEnv {
   readonly PUBLIC_HOURS_VERIFIED: string;
   readonly PUBLIC_PUJA_COUNTER_NAME: string;
   readonly PUBLIC_CONTACT_EMAIL: string;
+  readonly PUBLIC_GOOGLE_SITE_VERIFICATION: string;
   readonly PUBLIC_GA4_MEASUREMENT_ID: string;
   readonly PUBLIC_GOOGLE_ADS_ID: string;
   readonly PUBLIC_META_PIXEL_ID: string;
