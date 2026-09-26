@@ -9,6 +9,7 @@ export const TEST_WHATSAPP_E164 = '919999999999';
 export const TEST_PHONE_E164 = '918888888888';
 export const TEST_SITE_URL = 'https://example.test';
 export const TEST_MAPS_URL = 'https://maps.app.goo.gl/9FQnudyceXPjySFi7';
+export const TEST_SITE_VERIFICATION = 'test-site-verification-token';
 
 const PORT = Number(process.env.E2E_PORT ?? 4173);
 
@@ -36,6 +37,7 @@ export default defineConfig({
       PUBLIC_SITE_URL: TEST_SITE_URL,
       PUBLIC_BASE_PATH: '', // tests run at the domain root; .env.production may set a sub-path
       PUBLIC_MAPS_URL: TEST_MAPS_URL,
+      PUBLIC_GOOGLE_SITE_VERIFICATION: TEST_SITE_VERIFICATION,
       PUBLIC_GA4_MEASUREMENT_ID: '',
       PUBLIC_META_PIXEL_ID: '',
       PUBLIC_GOOGLE_ADS_ID: '',

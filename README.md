@@ -28,6 +28,7 @@ Nothing below is guessed. Until each item is supplied, the site shows an honest 
 | 11 | Privacy / contact email | `.env` → `PUBLIC_CONTACT_EMAIL` | Empty → not displayed. |
 | 12 | Real testimonials (with permission) | `src/config/site.ts` → `testimonials` | Empty → section links to Google reviews instead of inventing quotes. |
 | 13 | Google Maps embed URL (optional) | Replace `LocationArt` in `src/components/LocationSection.tsx` with the `<iframe>` from Maps → Share → Embed | A stylised non-map card is shown; Directions button uses the real Maps link. |
+| 14 | Google Search Console verification | `.env.production` → `PUBLIC_GOOGLE_SITE_VERIFICATION` | **Set 26 Sep 2026** (HTML-tag token for the URL-prefix property on the GitHub Pages address). Rendered as `<meta name="google-site-verification">` in every page head; empty → no tag. |
 
 ---
 
