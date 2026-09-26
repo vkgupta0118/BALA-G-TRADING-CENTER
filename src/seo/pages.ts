@@ -1,3 +1,4 @@
+import { env } from '@/config/env';
 import { site } from '@/config/site';
 import { type Lang, translate } from '@/i18n';
 import {
@@ -146,6 +147,10 @@ export function renderHeadTags(seo: PageSeo, lang: Lang): string {
     `<meta name="twitter:image" content="${esc(ogImage)}">`,
     `<meta name="geo.region" content="IN-WB">`,
     `<meta name="geo.placename" content="Siliguri">`,
+    // Search Console ownership check – only when a token is configured.
+    ...(env.googleSiteVerification
+      ? [`<meta name="google-site-verification" content="${esc(env.googleSiteVerification)}">`]
+      : []),
     ...seo.jsonLd.map(
       (block) =>
         `<script type="application/ld+json" data-jsonld="route">${JSON.stringify(block).replaceAll('</', '<\\/')}</script>`,
