@@ -128,6 +128,9 @@ fs.writeFileSync(
   ),
 );
 
+// Pages are written as <route>/index.html, which static hosts (GitHub Pages included)
+// serve at <route>/ and reach from <route> only via a 301. List the slash form so the
+// sitemap never names a redirecting URL — it must match the canonical tags exactly.
 const publicRoutes = routes.filter((r) => !r.excludeFromSitemap);
 const today = new Date().toISOString().slice(0, 10);
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -135,7 +138,7 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 ${publicRoutes
   .map(
     (r) => `  <url>
-    <loc>${siteUrl}${r.path === '/' ? '/' : r.path}</loc>
+    <loc>${siteUrl}${r.path === '/' ? '/' : `${r.path}/`}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>${r.changefreq ?? 'monthly'}</changefreq>
     <priority>${r.priority ?? '0.7'}</priority>
