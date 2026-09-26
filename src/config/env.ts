@@ -73,6 +73,22 @@ export function withBase(path: string): string {
   return path.startsWith('/') ? `${env.basePath}${path}` : path;
 }
 
+/**
+ * Page routes are built as directories (quote/index.html), and GitHub Pages answers
+ * /quote with a 301 to /quote/. Linking, canonicalising and listing the slash form
+ * directly means visitors and crawlers never hit that redirect.
+ * withTrailingSlash('/quote?add=cement') → '/quote/?add=cement'. The root, anything
+ * already ending in '/', and files (a dot in the last segment) are left unchanged.
+ */
+export function withTrailingSlash(path: string): string {
+  const cut = path.search(/[?#]/);
+  const pathname = cut === -1 ? path : path.slice(0, cut);
+  const rest = cut === -1 ? '' : path.slice(cut);
+  if (!pathname.startsWith('/') || pathname.endsWith('/')) return path;
+  if (pathname.slice(pathname.lastIndexOf('/') + 1).includes('.')) return path;
+  return `${pathname}/${rest}`;
+}
+
 /** Removes the base path from a browser pathname: stripBase('/REPO/quote') → '/quote'. */
 export function stripBase(pathname: string): string {
   if (env.basePath && (pathname === env.basePath || pathname.startsWith(`${env.basePath}/`))) {
