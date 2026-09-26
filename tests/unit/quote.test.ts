@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { formatE164ForDisplay, normaliseE164, stripBase, withBase } from '@/config/env';
+import {
+  formatE164ForDisplay,
+  normaliseE164,
+  stripBase,
+  withBase,
+  withTrailingSlash,
+} from '@/config/env';
 import {
   buildGenericMessage,
   buildQuoteMessage,
@@ -216,6 +222,20 @@ describe('Base path (GitHub Pages sub-path hosting)', () => {
     assert.equal(withBase('/quote'), '/REPO/quote');
     assert.equal(withBase('/quote?add=cement'), '/REPO/quote?add=cement');
     assert.equal(withBase('https://wa.me/1'), 'https://wa.me/1');
+  });
+  it('adds the trailing slash GitHub Pages serves page routes at, and nothing else', () => {
+    assert.equal(withTrailingSlash('/'), '/');
+    assert.equal(withTrailingSlash('/products'), '/products/');
+    assert.equal(withTrailingSlash('/products/'), '/products/');
+    assert.equal(withTrailingSlash('/quote?add=cement'), '/quote/?add=cement');
+    assert.equal(withTrailingSlash('/products#cement'), '/products/#cement');
+    assert.equal(withTrailingSlash('/og-image.png'), '/og-image.png');
+    assert.equal(
+      withTrailingSlash('/images/bricks/bricks-640.avif'),
+      '/images/bricks/bricks-640.avif',
+    );
+    assert.equal(withTrailingSlash('https://wa.me/1'), 'https://wa.me/1');
+    assert.equal(withTrailingSlash('#main'), '#main');
   });
   it('strips the base path from browser pathnames', () => {
     assert.equal(stripBase('/REPO'), '/');
