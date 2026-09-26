@@ -1,10 +1,15 @@
-import { env, formatE164ForDisplay } from '@/config/env';
+import { env, formatE164ForDisplay, withTrailingSlash } from '@/config/env';
 import { productCategories } from '@/config/products';
 import { site } from '@/config/site';
 
-/** Absolute URL helper – falls back to a path when PUBLIC_SITE_URL is not yet set. */
+/**
+ * Absolute URL helper – falls back to a path when PUBLIC_SITE_URL is not yet set.
+ * Page paths get their trailing slash so canonical and og:url name the URL the host
+ * actually serves (no redirect): absoluteUrl('/products') → '<site>/products/'.
+ */
 export function absoluteUrl(path: string): string {
-  return env.siteUrl ? `${env.siteUrl}${path === '/' ? '/' : path}` : path;
+  const normalised = withTrailingSlash(path);
+  return env.siteUrl ? `${env.siteUrl}${normalised}` : normalised;
 }
 
 type JsonLd = Record<string, unknown>;
