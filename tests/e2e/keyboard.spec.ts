@@ -74,7 +74,7 @@ test.describe('Keyboard navigation', () => {
     await page.goto('/');
     await page.getByRole('link', { name: 'Products', exact: true }).first().focus();
     await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(/\/products$/);
+    await expect(page).toHaveURL(/\/products\/$/);
     await expect(page.locator('#main')).toBeFocused();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('What we supply');
     await expect(page).toHaveTitle(/Cement, Bricks, TMT Rods & Hardware in Siliguri/);

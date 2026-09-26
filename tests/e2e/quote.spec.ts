@@ -111,7 +111,7 @@ test.describe('Quote builder – WhatsApp message', () => {
   test('?add=<category> pre-selects a material from product cards', async ({ page }) => {
     await page.goto('/products');
     await page.getByTestId('add-tmt').click();
-    await expect(page).toHaveURL(/\/quote\?add=tmt$/);
+    await expect(page).toHaveURL(/\/quote\/\?add=tmt$/);
     await expect(page.getByTestId('quote-line')).toHaveCount(1);
     await expect(page.getByTestId('quote-line').first()).toContainText('TMT Rods & Steel');
   });

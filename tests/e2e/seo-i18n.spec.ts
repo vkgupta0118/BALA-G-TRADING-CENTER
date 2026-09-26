@@ -18,7 +18,7 @@ test.describe('SEO & pre-rendering', () => {
       expect(html).toMatch(new RegExp(`<title>[^<]*${title.source}`));
       expect(html).toContain('<meta name="description"');
       expect(html).toContain(
-        `<link rel="canonical" href="${TEST_SITE_URL}${path === '/' ? '/' : path}">`,
+        `<link rel="canonical" href="${TEST_SITE_URL}${path === '/' ? '/' : `${path}/`}">`,
       );
       expect(html).toContain('"@type":["LocalBusiness","HardwareStore"]');
       expect(html).toContain('property="og:image"');
@@ -38,9 +38,13 @@ test.describe('SEO & pre-rendering', () => {
     const sitemap = await request.get('/sitemap.xml');
     expect(sitemap.status()).toBe(200);
     const xml = await sitemap.text();
-    for (const p of ['/', '/products', '/quote', '/contact']) {
+    // Trailing slashes: GitHub Pages serves <route>/index.html at <route>/ and 301s the
+    // bare form, so the sitemap must name the slash form or Search Console reports
+    // "Page with redirect".
+    for (const p of ['/', '/products/', '/quote/', '/contact/']) {
       expect(xml).toContain(`<loc>${TEST_SITE_URL}${p}</loc>`);
     }
+    expect(xml).not.toMatch(/<loc>[^<]*\/(products|quote|contact)<\/loc>/);
     expect(xml).not.toContain('/404');
 
     expect((await request.get('/site.webmanifest')).status()).toBe(200);
@@ -48,6 +52,27 @@ test.describe('SEO & pre-rendering', () => {
     const missing = await request.get('/does-not-exist');
     expect(missing.status()).toBe(404);
     expect(await missing.text()).toContain('Page not found');
+  });
+
+  test('internal page links and og:url use the slash form the host serves directly', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const hrefs = await page
+      .locator('a[href^="/"]')
+      .evaluateAll((els) => [...new Set(els.map((el) => el.getAttribute('href') ?? ''))]);
+    expect(hrefs.length).toBeGreaterThan(3);
+    for (const href of hrefs) {
+      const pathname = href.split(/[?#]/)[0] ?? '';
+      // every internal page link ends in "/" (files would contain a dot)
+      if (!pathname.split('/').pop()?.includes('.')) expect(pathname, href).toMatch(/\/$/);
+    }
+    expect(hrefs).toContain('/quote/?add=cement');
+    await page.goto('/products/');
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+      'content',
+      `${TEST_SITE_URL}/products/`,
+    );
   });
 
   test('no false claims appear anywhere on the site', async ({ page }) => {
