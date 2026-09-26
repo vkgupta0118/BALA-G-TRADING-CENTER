@@ -246,19 +246,48 @@ including Puja Samagri, and five photographs in use with seven still needed.
   festival: Lakshmi Puja" and "Needed by: 20 Oct 2026".
 - No horizontal overflow at desktop width.
 
-## Still not verified / still needs the owner
+## Still not verified / still needs the owner (as of 21 Sep; see the 26 Sep update below)
 
-- **Tap WhatsApp and Call on a real phone.** The links are correct; whether
-  WhatsApp Business is active on 93391 88629 and the call reaches 79082 46939 can
-  only be confirmed by tapping them.
+- ~~Tap WhatsApp and Call on a real phone.~~ **Done 26 Sep** — owner confirmed both work.
 - Core Web Vitals on a real device and network (the build is budgeted for LCP ≤
   2.5s / CLS 0 but not measured in the field yet).
 - The **7 photographs** in `docs/image-asset-plan.md` — storefront/signboard
   first; TMT, hardware, Puja Samagri and materials cards still show the
   "photo coming soon" panel.
-- Google Business Profile: correct the name to "M/S Balajee Trading Centre" and
-  add the website URL; Search Console: submit `/sitemap.xml`.
+- ~~Google Business Profile: correct the name and add the website URL.~~ **Done
+  26 Sep** (owner). Search Console: submit the sitemap — still open.
 - Bengali copy review by a native speaker.
 - Local copy `E:\AI\siliguri` mirrors the deployed source; the retired `scene`
   files were moved to `E:\AI\siliguri\_to_delete\` because this session cannot
   delete on that machine — delete that folder when convenient.
+
+---
+
+# Update — 26 September 2026
+
+## Owner confirmations
+
+- **WhatsApp (93391 88629) and Call (79082 46939) tested on a real phone — both
+  work.** This closes the one check no automated test could make.
+- **Google Business Profile updated** by the owner (name and website).
+
+## Fix: sitemap and canonical URLs named redirecting addresses
+
+Checked on the live site before the owner submits the sitemap to Search Console:
+GitHub Pages serves each page from `<route>/index.html`, so `/products`,
+`/quote` and `/contact` answered with a **301 to the trailing-slash form**
+(`/products/` etc.). The sitemap, the `<link rel="canonical">` tags, `og:url`,
+JSON-LD URLs and every internal link all used the bare form — so 3 of the 4
+sitemap URLs were redirects, and each page's canonical pointed at a URL that
+redirected back to itself. Search Console reports that as "Page with redirect".
+
+Fixed at the source, not per page: `withTrailingSlash()` in `src/config/env.ts`
+(root, files and already-slashed paths untouched) is used by `absoluteUrl()` for
+canonical/og:url/JSON-LD and by the router's `<Link>`/`navigate()` for hrefs and
+history entries; `scripts/build.mjs` writes the slash form into `sitemap.xml`.
+The router already normalised trailing slashes when matching routes, so no
+routing change was needed.
+
+Tests: 1 new unit test (9 cases, 29 total) and 1 new E2E test (every internal page
+link and `og:url` end in `/`, run on desktop and Pixel 7 — 76 E2E total); the
+canonical, sitemap and two URL assertions were updated. `npm run verify` exit 0.
