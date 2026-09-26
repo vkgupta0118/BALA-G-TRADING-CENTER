@@ -9,7 +9,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { stripBase, withBase } from '@/config/env';
+import { stripBase, withBase, withTrailingSlash } from '@/config/env';
 
 /**
  * Minimal, dependency-free client-side router.
@@ -49,7 +49,7 @@ export function RouterProvider({
   const navigate = useCallback((to: string, options?: { replace?: boolean }) => {
     const next = normalisePath(to);
     const hash = to.includes('#') ? to.slice(to.indexOf('#')) : '';
-    const url = withBase(to);
+    const url = withBase(withTrailingSlash(to));
     if (options?.replace) window.history.replaceState(null, '', url);
     else window.history.pushState(null, '', url);
     setPath(next);
@@ -104,7 +104,7 @@ export function Link({ to, children, onClick, ...rest }: LinkProps) {
 
   return (
     <a
-      href={isInternal ? withBase(to) : to}
+      href={isInternal ? withBase(withTrailingSlash(to)) : to}
       onClick={handleClick}
       aria-current={isActive ? 'page' : undefined}
       {...rest}
