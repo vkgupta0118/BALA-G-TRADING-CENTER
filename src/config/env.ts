@@ -50,6 +50,13 @@ export const env = {
   /** Trading name of the Puja Samagri counter, or '' when the owner has not confirmed one. */
   pujaCounterName: clean(import.meta.env.PUBLIC_PUJA_COUNTER_NAME),
   contactEmail: clean(import.meta.env.PUBLIC_CONTACT_EMAIL),
+  /** Google Search Console HTML-tag token. Public by design (it is printed in <head>);
+   *  anything that is not a plain token is ignored rather than injected. */
+  googleSiteVerification: /^[A-Za-z0-9_-]{10,100}$/.test(
+    clean(import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION),
+  )
+    ? clean(import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION)
+    : '',
   ga4Id: clean(import.meta.env.PUBLIC_GA4_MEASUREMENT_ID),
   googleAdsId: clean(import.meta.env.PUBLIC_GOOGLE_ADS_ID),
   metaPixelId: clean(import.meta.env.PUBLIC_META_PIXEL_ID),
